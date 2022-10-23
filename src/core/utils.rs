@@ -1,4 +1,4 @@
-use crate::extras;
+use super::extras;
 
 pub fn squarest_rect_with_even_area(n: u32) -> [u32; 2] {
     let area = 2 * n;

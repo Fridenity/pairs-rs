@@ -5,7 +5,6 @@ use rand::{
     thread_rng, Rng,
 };
 use std::{fmt, ops::Deref};
-use termion::color;
 
 #[derive(Debug)]
 pub enum CardConvertionError {
@@ -15,19 +14,19 @@ pub enum CardConvertionError {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Rank {
-    ACE,
-    TWO,
-    THREE,
-    FOUR,
-    FIVE,
-    SIX,
-    SEVEN,
-    EIGHT,
-    NINE,
-    TEN,
-    JACK,
-    QUEEN,
-    KING,
+    Ace,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Jack,
+    Queen,
+    King,
 }
 
 impl TryFrom<u8> for Rank {
@@ -38,19 +37,19 @@ impl TryFrom<u8> for Rank {
             return Err(CardConvertionError::IntoRankError);
         }
         Ok(match value {
-            0 => Rank::ACE,
-            1 => Rank::TWO,
-            2 => Rank::THREE,
-            3 => Rank::FOUR,
-            4 => Rank::FIVE,
-            5 => Rank::SIX,
-            6 => Rank::SEVEN,
-            7 => Rank::EIGHT,
-            8 => Rank::NINE,
-            9 => Rank::TEN,
-            10 => Rank::JACK,
-            11 => Rank::QUEEN,
-            12 => Rank::KING,
+            0 => Rank::Ace,
+            1 => Rank::Two,
+            2 => Rank::Three,
+            3 => Rank::Four,
+            4 => Rank::Five,
+            5 => Rank::Six,
+            6 => Rank::Seven,
+            7 => Rank::Eight,
+            8 => Rank::Nine,
+            9 => Rank::Ten,
+            10 => Rank::Jack,
+            11 => Rank::Queen,
+            12 => Rank::King,
             _ => unreachable!(),
         })
     }
@@ -65,22 +64,22 @@ impl Distribution<Rank> for Standard {
 impl fmt::Display for Rank {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let s = match self {
-            Rank::ACE => "A".to_owned(),
-            Rank::JACK => "J".to_owned(),
-            Rank::QUEEN => "Q".to_owned(),
-            Rank::KING => "K".to_owned(),
+            Rank::Ace => "A".to_owned(),
+            Rank::Jack => "J".to_owned(),
+            Rank::Queen => "Q".to_owned(),
+            Rank::King => "K".to_owned(),
             _ => (*self as u8 + 1).to_string(),
         };
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Suit {
-    CLUBS,
-    DIAMONDS,
-    HEARTS,
-    SPADES,
+    Clubs,
+    Diamonds,
+    Hearts,
+    Spades,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
@@ -97,10 +96,10 @@ impl TryFrom<u8> for Suit {
             return Err(CardConvertionError::IntoSuitError);
         }
         Ok(match value {
-            0 => Suit::CLUBS,
-            1 => Suit::DIAMONDS,
-            2 => Suit::HEARTS,
-            3 => Suit::SPADES,
+            0 => Suit::Clubs,
+            1 => Suit::Diamonds,
+            2 => Suit::Hearts,
+            3 => Suit::Spades,
             _ => unreachable!(),
         })
     }
@@ -109,7 +108,7 @@ impl TryFrom<u8> for Suit {
 impl Suit {
     fn color(&self) -> SuitColor {
         match self {
-            &Suit::CLUBS | &Suit::SPADES => SuitColor::BLACK,
+            &Suit::Clubs | &Suit::Spades => SuitColor::BLACK,
             _ => SuitColor::RED,
         }
     }
@@ -135,8 +134,8 @@ pub struct Card {
 }
 
 impl Card {
-    pub fn new(suit: Suit, rank: Rank) -> Card {
-        Card { suit, rank }
+    pub fn new(suit: Suit, rank: Rank) -> Self {
+        Self { suit, rank }
     }
 
     fn color(&self) -> SuitColor {
@@ -157,23 +156,24 @@ impl TryFrom<[u8; 2]> for Card {
 
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let colorize_fn = |s: &str| match self.color() {
-            SuitColor::RED => format!(
-                "{}{:>3}{}",
-                color::Fg(color::Red),
-                s,
-                color::Fg(color::Reset)
-            ),
-            _ => format!(
-                "{}{}{}",
-                color::Fg(color::Black),
-                s,
-                color::Fg(color::Reset)
-            ),
-        };
+        // let colorize_fn = |s: &str| match self.color() {
+        //     SuitColor::RED => format!(
+        //         "{}{:>3}{}",
+        //         color::Fg(color::Red),
+        //         s,
+        //         color::Fg(color::Reset)
+        //     ),
+        //     _ => format!(
+        //         "{}{}{}",
+        //         color::Fg(color::Black),
+        //         s,
+        //         color::Fg(color::Reset)
+        //     ),
+        // };
 
         let card_fmt = format!("{:>2}{}", self.rank.to_string(), self.suit);
-        write!(f, "{}", colorize_fn(&card_fmt))
+        // write!(f, "{}", colorize_fn(&card_fmt))
+        write!(f, "{card_fmt}")
     }
 }
 
@@ -196,7 +196,7 @@ impl Deref for Deck {
     }
 }
 
-#[allow(dead_code)] // TODO: deal with this later
+#[allow(dead_code)] // TODO: 
 impl Deck {
     fn all_cards() -> [Card; 52] {
         (0..4)
@@ -227,25 +227,25 @@ impl Deck {
         chunked
             .into_iter()
             .flatten()
-            .map(|c| c.to_owned())
+            .cloned()
             .collect_vec()
             .try_into()
             .unwrap()
     }
 
-    pub fn new() -> Deck {
-        Deck(Deck::all_cards())
+    pub fn new() -> Self {
+        Self(Self::all_cards())
     }
 
-    pub fn paired() -> Deck {
-        Deck(Deck::all_cards_paired())
+    pub fn paired() -> Self {
+        Self(Self::all_cards_paired())
     }
 
-    pub fn shuffled() -> Deck {
-        Deck(Deck::all_cards_shuffled())
+    pub fn shuffled() -> Self {
+        Self(Self::all_cards_shuffled())
     }
 
-    pub fn paired_shuffled() -> Deck {
-        Deck(Deck::all_cards_paired_shuffled())
+    pub fn paired_shuffled() -> Self {
+        Self(Self::all_cards_paired_shuffled())
     }
 }

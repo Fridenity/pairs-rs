@@ -1,12 +1,7 @@
-mod cards;
-mod core;
-mod extras;
-mod utils;
+use pairs_rs::start_ui;
+use std::error::Error;
 
-fn main() {
-    let mut board = core::generate_board(18).unwrap();
-
-    board.flip(2, 2);
-    board.flip(3, 3);
-    println!("{}", board)
+fn main() -> Result<(), Box<dyn Error>> {
+    start_ui()?;
+    Ok(())
 }
